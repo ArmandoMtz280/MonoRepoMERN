@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import ProjectForm from "@/components/projects/ProjectForm";
 import type { ProjectFormData } from "@/types";
@@ -16,13 +17,28 @@ export default function CreateProjectsView () {
 
    const {register, handleSubmit, formState: {errors}} = useForm({defaultValues: initialValues});
 
-   const handleForm = async (formdata: ProjectFormData) => {
-        const data = await createProject(formdata) // Se crea proyecto
+   const { mutate } = useMutation({ // uso de useMutation de react-query
+      mutationFn: createProject, // funcion que se ejecuta
+      onError: (error) => {   // que sucede en un error
+        toast.error(error.message)
+      },
+      onSuccess: (data) => {  // que sucede cuando es exitosa 
         toast.success(data)
         naviegate("/") // se redirecciona a proyectos
+      }
+   });
 
-   }
+/**con mutate no se requiere q la funcion se asincrona react query maneja la asincronia */
+   const handleForm = (formdata: ProjectFormData) => mutate(formdata);
 
+
+   // const handleForm = async (formdata: ProjectFormData) => {
+   //    await mutation.mutateAsync(formdata);
+   //    //   const data = await createProject(formdata) // Se crea proyecto
+   //    //   toast.success(data)
+   //    //   naviegate("/") // se redirecciona a proyectos
+   // };
+ 
    return(
        <>
         <div className="max-w-3xl ">
