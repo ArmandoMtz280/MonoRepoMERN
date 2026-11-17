@@ -17,7 +17,7 @@ export default function AppLayout() {
            </div>
         </header>
 
-        <section className="max-w-screen-2xl mx-auto mt-10 p-5 flex flex-col justify-center items-center">
+        <section className="max-w-screen-2xl mx-auto mt-10 p-5 flex flex-col">
           <Outlet />
         </section>
 
