@@ -52,7 +52,7 @@ export default function CreateProjectsView () {
                </Link>
            </nav>
 
-           <form className="mt-10 bg-white shadow-lg p-10 rounded-lg" onClick={handleSubmit(handleForm)} noValidate>
+           <form className="mt-10 bg-white shadow-lg p-10 rounded-lg" onSubmit={handleSubmit(handleForm)} noValidate>
 
               <ProjectForm
                 register={register}
