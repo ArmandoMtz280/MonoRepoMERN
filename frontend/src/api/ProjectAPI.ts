@@ -4,6 +4,7 @@ import api from "@/lib/lib"
 import { dashboardProjectSchema, type Project, type ProjectFormData } from "@/types"
 import { isAxiosError } from "axios";
 
+// Crear proyecto
 export const createProject = async (formData: ProjectFormData) => {
      
      try{
@@ -18,6 +19,7 @@ export const createProject = async (formData: ProjectFormData) => {
 
 };
 
+// Obtener todos los proyectos
 export const getAllProjects = async () => {
    try{
       const { data } = await api("/projects");
@@ -32,6 +34,7 @@ export const getAllProjects = async () => {
    }  
 };
 
+// Obtener Proyecto por ID
 export const getProjectByID = async (id: Project["_id"]) => {
    try{
       const { data } = await api(`/projects/${id}`);
@@ -44,11 +47,13 @@ export const getProjectByID = async (id: Project["_id"]) => {
    }  
 };
 
+// Types para updateProject
 type ProjectAPIType = {
    formData: ProjectFormData,
    projectId: Project["_id"]
 };
 
+// Editar Proyecto
 export const updateProject = async ({formData, projectId}: ProjectAPIType) => {
    console.log(formData)
    try{
@@ -58,6 +63,20 @@ export const updateProject = async ({formData, projectId}: ProjectAPIType) => {
       }catch(error){
       if(isAxiosError(error) && error.response){ // valida q sea un error de axios
           throw new Error(error.response.data.error) // se lanza el error y lo cacha useMutation en EditProjectsView
+      }
+   }  
+};
+
+// Eliminar Proyecto
+export const deleteProject = async (id: Project["_id"]) => {
+   try{
+      const URL = `/projects/${id}`;
+      const { data } = await api.delete<string>(URL);
+      return data;
+      
+      }catch(error){
+      if(isAxiosError(error) && error.response){ // valida q sea un error de axios
+          throw new Error(error.response.data.error) // se lanza el error y lo cacha useMutation en CreateProjectsView
       }
    }  
 };
