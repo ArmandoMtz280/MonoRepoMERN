@@ -43,3 +43,21 @@ export const getProjectByID = async (id: Project["_id"]) => {
       }
    }  
 };
+
+type ProjectAPIType = {
+   formData: ProjectFormData,
+   projectId: Project["_id"]
+};
+
+export const updateProject = async ({formData, projectId}: ProjectAPIType) => {
+   console.log(formData)
+   try{
+      const { data } = await api.put<string>(`/projects/${projectId}`, formData);
+      return data;
+      
+      }catch(error){
+      if(isAxiosError(error) && error.response){ // valida q sea un error de axios
+          throw new Error(error.response.data.error) // se lanza el error y lo cacha useMutation en EditProjectsView
+      }
+   }  
+};

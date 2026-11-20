@@ -7,6 +7,7 @@ import { corsConfig } from "./config/cors";
 import dns from "node:dns"
 import { connectDB } from "./config/db";
 import  projectRoutes from "./routes/projectRoutes";
+import morgan from "morgan";
  
 
 
@@ -17,6 +18,8 @@ connectDB(); // Conexion DB
 
 const app = express(); // server
       app.use(cors(corsConfig)) // permite la conexion con la confi de CORS
+      app.use(morgan("dev")) // Loggin
+      
       app.use(express.json()) // habilita lectura de json
 
 // Routes

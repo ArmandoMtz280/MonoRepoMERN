@@ -1,24 +1,48 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ProjectForm from "./ProjectForm";
 import { useForm } from "react-hook-form";
-import type { ProjectFormData } from "@/types";
+import type { Project, ProjectFormData } from "@/types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateProject } from "@/api/ProjectAPI";
+import { toast } from "react-toastify";
 
 
 type EditProjectFormProps = {
-    data: ProjectFormData
+    data: ProjectFormData,
+    projectId: Project["_id"]
 }
 
 
-export default function EditProjectForm({data} : EditProjectFormProps) {
+export default function EditProjectForm({data, projectId} : EditProjectFormProps) {
     
-       const {register, handleSubmit, formState: {errors}} = useForm({defaultValues: {
+       const navigate = useNavigate();
+       const {register, handleSubmit, formState: {errors}} = useForm({defaultValues: { // Use form by rect-hook-forms
           projectName: data.projectName,
           clientName: data.clientName,
           description: data.description
        }});
 
+       const queryClient = useQueryClient(); // para invalidar los queries anteriores y hacer otra peticion
+       const { mutate } = useMutation({ // react-query
+           mutationFn: updateProject,
+           onError: (error) => {
+              toast.error(error.message)
+           },
+           onSuccess: (data) => {
+              queryClient.invalidateQueries({queryKey: ["projects"]})
+              queryClient.invalidateQueries({queryKey: ["editProject", projectId]})
+              toast.success(data);
+              navigate("/")
+           }
+       })
+
        const handleForm = (formData: ProjectFormData) => {
-           console.log(formData)
+           const data = {
+              formData,
+              projectId
+           }
+
+           mutate(data)
        };
  
     return(
@@ -34,7 +58,7 @@ export default function EditProjectForm({data} : EditProjectFormProps) {
                </Link>
            </nav>
 
-           <form className="mt-10 bg-white shadow-lg p-10 rounded-lg" onClick={handleSubmit(handleForm)} noValidate>
+           <form className="mt-10 bg-white shadow-lg p-10 rounded-lg" onSubmit={handleSubmit(handleForm)} noValidate>
 
               <ProjectForm
                 register={register}
