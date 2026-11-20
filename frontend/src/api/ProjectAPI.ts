@@ -1,7 +1,7 @@
 /**Este archivo se encarga de hacer todas las peticiones al API*/
 
 import api from "@/lib/lib"
-import { dashboardProjectSchema, type ProjectFormData } from "@/types"
+import { dashboardProjectSchema, type Project, type ProjectFormData } from "@/types"
 import { isAxiosError } from "axios";
 
 export const createProject = async (formData: ProjectFormData) => {
@@ -26,6 +26,18 @@ export const getAllProjects = async () => {
           return response.data
       }
    }catch(error){
+      if(isAxiosError(error) && error.response){ // valida q sea un error de axios
+          throw new Error(error.response.data.error) // se lanza el error y lo cacha useMutation en CreateProjectsView
+      }
+   }  
+};
+
+export const getProjectByID = async (id: Project["_id"]) => {
+   try{
+      const { data } = await api(`/projects/${id}`);
+      return data;
+      
+      }catch(error){
       if(isAxiosError(error) && error.response){ // valida q sea un error de axios
           throw new Error(error.response.data.error) // se lanza el error y lo cacha useMutation en CreateProjectsView
       }
