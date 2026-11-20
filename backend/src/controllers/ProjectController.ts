@@ -12,6 +12,7 @@ export class ProjectController {
 
    static createProject = async (req: Request, res: Response) => {
       const project = new IProject(req.body); // crea instancia del proyecto desde el modelo se le pasa el req.body que es el q trae la data
+
       try{
          /**
           * OTRA FORMA DE CREAR
