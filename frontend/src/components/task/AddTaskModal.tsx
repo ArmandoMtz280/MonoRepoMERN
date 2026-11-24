@@ -6,31 +6,57 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import TaskForm from "./TaskForm";
 import type { TaskFormData } from "@/types";
+import { useMutation } from "@tanstack/react-query";
+import { createTask } from "@/api/TaskAPI";
+import { toast } from "react-toastify";
 
 export default function AddTaskModal() {
 
   const navigate = useNavigate();
+  /** Leer si modal existe */
   const location = useLocation(); // permite leer datos desde la URL
   const queryParams = new URLSearchParams(location.search); // nos da un query String
   const modalTask = queryParams.get("newTask"); // revisa que ese query param exista
   const show = modalTask ? true : false;
   console.log(modalTask);
+  /** Obtener projectId */
+  const params = useParams(); 
+  const projectId = params.projectId!
+  console.log(params);
    
   const initialValues : TaskFormData = {
     name: "",
     description: ""
   };
 
-  const {register, handleSubmit, formState: {errors}} = useForm({defaultValues: initialValues});
+  const {register, handleSubmit, reset , formState: {errors}} = useForm({defaultValues: initialValues});
 
+  
+  const { mutate } = useMutation({
+    mutationFn: createTask,
+    onError: (error) => {
+      toast.error(error.message)
+    },
+    onSuccess: (data) => {
+      toast.success(data)
+      reset() // reinicia el formulario
+      navigate(location.pathname, {replace: true})
+    }
+  });
+  
   const handleCreateTask = (formData: TaskFormData) => {
-      console.log(formData)
-  }
- 
+      const data = {
+        formData,
+        projectId
+      }
+      console.log(data)
+      mutate(data)
+  };
+
   return (
     <>
       <Transition appear show={show} as={Fragment}>
@@ -67,7 +93,7 @@ export default function AddTaskModal() {
                     Llena el formulario y crea {""}
                     <span className="text-fuchsia-600">una tarea</span>
                   </p>
-                  <form className="mt-10 space-y-3" noValidate>
+                  <form className="mt-10 space-y-3" noValidate onSubmit={handleSubmit(handleCreateTask)}>
 
                      <TaskForm 
                        register={register}
@@ -75,7 +101,6 @@ export default function AddTaskModal() {
                      />
 
                      <input 
-                       onSubmit={handleSubmit(handleCreateTask)}
                        type="submit" 
                        value="Guardar Tarea"
                        className="bg-fuchsia-600 hover:bg-fuchsia-700 w-full p-3 text-white uppercase font-bold cursor-pointer transition-colors"/>
