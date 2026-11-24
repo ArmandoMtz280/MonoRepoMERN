@@ -7,6 +7,9 @@ import {
   DialogTitle,
 } from "@headlessui/react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import TaskForm from "./TaskForm";
+import type { TaskFormData } from "@/types";
 
 export default function AddTaskModal() {
 
@@ -17,9 +20,17 @@ export default function AddTaskModal() {
   const show = modalTask ? true : false;
   console.log(modalTask);
    
+  const initialValues : TaskFormData = {
+    name: "",
+    description: ""
+  };
 
-  
+  const {register, handleSubmit, formState: {errors}} = useForm({defaultValues: initialValues});
 
+  const handleCreateTask = (formData: TaskFormData) => {
+      console.log(formData)
+  }
+ 
   return (
     <>
       <Transition appear show={show} as={Fragment}>
@@ -56,6 +67,19 @@ export default function AddTaskModal() {
                     Llena el formulario y crea {""}
                     <span className="text-fuchsia-600">una tarea</span>
                   </p>
+                  <form className="mt-10 space-y-3" noValidate>
+
+                     <TaskForm 
+                       register={register}
+                       errors={errors}
+                     />
+
+                     <input 
+                       onSubmit={handleSubmit(handleCreateTask)}
+                       type="submit" 
+                       value="Guardar Tarea"
+                       className="bg-fuchsia-600 hover:bg-fuchsia-700 w-full p-3 text-white uppercase font-bold cursor-pointer transition-colors"/>
+                  </form>
                 </DialogPanel>
               </TransitionChild>
             </div>
